@@ -1,1 +1,7 @@
-package go_gb
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("Hello world!")
+}
