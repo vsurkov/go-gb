@@ -3,6 +3,7 @@ package main
 import (
 	fmt "fmt"
 	"math"
+	"strconv"
 )
 
 func main() {
@@ -57,12 +58,17 @@ func numComposition() {
 	var num int
 	fmt.Print("Введите целое число в диапазоне от 100 до 999: ")
 	fmt.Scan(&num)
-	hungreds := num / 100
-	hungredsRemainder := num % 100
-	tens := hungredsRemainder / 10
-	units := hungredsRemainder % 10
+	fmt.Println(strconv.Itoa(num))
+	if len(strconv.Itoa(num)) == 3 {
+		hungreds := num / 100
+		hungredsRemainder := num % 100
+		tens := hungredsRemainder / 10
+		units := hungredsRemainder % 10
 
-	fmt.Printf("Сотен: %d\n", hungreds)
-	fmt.Printf("Десятков: %d\n", tens)
-	fmt.Printf("Единиц: %d\n", units)
+		fmt.Printf("Сотен: %d\n", hungreds)
+		fmt.Printf("Десятков: %d\n", tens)
+		fmt.Printf("Единиц: %d\n", units)
+	} else {
+		fmt.Println("Ошибка: введенное значение не трехзначное число")
+	}
 }
