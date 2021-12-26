@@ -1,21 +1,26 @@
 package main
 
 import (
-	fmt "fmt"
+	"fmt"
 	"math"
 	"strconv"
 )
 
 func main() {
-	var choise int
+	var choice int
 	fmt.Println("Введите целое число в диапазоне от 1 до 3, включительно: ")
 	fmt.Println("1 - подчет площади прямоугольника")
 	fmt.Println("2 - подсчет диаметра и длины окружности по площади круга")
 	fmt.Println("3 - состав числа")
 	fmt.Print("Ваш выбор: ")
-	fmt.Scanln(&choise)
 
-	switch choise {
+	_, err := fmt.Scanln(&choice)
+	if err != nil {
+		fmt.Print("Ошибка: вероятно, указанное значение не число")
+		return
+	}
+
+	switch choice {
 	case 1:
 		squareArea()
 	case 2:
@@ -32,9 +37,18 @@ func main() {
 func squareArea() {
 	var a, b float32
 	fmt.Print("Введите сторону a прямоугольника: ")
-	fmt.Scanln(&a)
+	_, err := fmt.Scanln(&a)
+	if err != nil {
+		fmt.Print("Ошибка: вероятно, указанное значение не число")
+		return
+	}
+
 	fmt.Print("Введите сторону b прямоугольника: ")
-	fmt.Scanln(&b)
+	_, err = fmt.Scanln(&b)
+	if err != nil {
+		fmt.Print("Ошибка: вероятно, указанное значение не число")
+		return
+	}
 	fmt.Printf("Площадь прямоугольника равна: %f\n", a*b)
 }
 
@@ -43,7 +57,11 @@ func squareArea() {
 func circleData() {
 	var s float32
 	fmt.Print("Введите площадь круга: ")
-	fmt.Scanln(&s)
+	_, err := fmt.Scanln(&s)
+	if err != nil {
+		fmt.Print("Ошибка: вероятно, указанное значение не число")
+		return
+	}
 
 	d := 2 * math.Sqrt(float64(s/math.Pi))
 	fmt.Printf("Диаметр круга: %f\n", d)
@@ -57,15 +75,18 @@ func circleData() {
 func numComposition() {
 	var num int
 	fmt.Print("Введите целое число в диапазоне от 100 до 999: ")
-	fmt.Scan(&num)
-	fmt.Println(strconv.Itoa(num))
+	_, err := fmt.Scan(&num)
+	if err != nil {
+		fmt.Print("Ошибка: вероятно, указанное значение не число")
+		return
+	}
 	if len(strconv.Itoa(num)) == 3 {
-		hungreds := num / 100
-		hungredsRemainder := num % 100
-		tens := hungredsRemainder / 10
-		units := hungredsRemainder % 10
+		hundreds := num / 100
+		hundredsRemainder := num % 100
+		tens := hundredsRemainder / 10
+		units := hundredsRemainder % 10
 
-		fmt.Printf("Сотен: %d\n", hungreds)
+		fmt.Printf("Сотен: %d\n", hundreds)
 		fmt.Printf("Десятков: %d\n", tens)
 		fmt.Printf("Единиц: %d\n", units)
 	} else {
