@@ -65,3 +65,4 @@ func numComposition() {
 	fmt.Printf("Сотен: %d\n", hungreds)
 	fmt.Printf("Десятков: %d\n", tens)
 	fmt.Printf("Единиц: %d\n", units)
+}
