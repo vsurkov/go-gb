@@ -38,6 +38,10 @@ func Calc() {
 	case "*":
 		res = a * b
 	case "/":
+		if b == 0 {
+			fmt.Println("Ошибка: в элементарной алгебре деление на 0 запрещено")
+			os.Exit(1)
+		}
 		res = a / b
 	case "sqrt":
 		res = float32(math.Sqrt(float64(a)))
