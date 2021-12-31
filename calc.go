@@ -3,30 +3,32 @@ package main
 import (
 	"fmt"
 	"math"
-	"os"
 )
 
-func Calc() {
+func Calc() error {
 	var a, b, res float32
 	var op string
 
 	fmt.Print("Введите арифметическую операцию (+, -, *, /, sqrt, pow): ")
 	_, err := fmt.Scanln(&op)
 	if err != nil {
-		exitWrongInput()
+		fmt.Println("Ошибка: чтения данных")
+		return err
 	}
 
 	fmt.Print("Введите число A: ")
 	_, err = fmt.Scanln(&a)
 	if err != nil {
-		exitWrongInput()
+		fmt.Println("Ошибка: чтения данных")
+		return err
 	}
 
 	if op != "sqrt" {
 		fmt.Print("Введите число B: ")
 		_, err = fmt.Scanln(&b)
 		if err != nil {
-			exitWrongInput()
+			fmt.Println("Ошибка: чтения данных")
+			return err
 		}
 	}
 
@@ -40,7 +42,7 @@ func Calc() {
 	case "/":
 		if b == 0 {
 			fmt.Println("Ошибка: в элементарной алгебре деление на 0 запрещено")
-			os.Exit(1)
+			return err
 		}
 		res = a / b
 	case "sqrt":
@@ -48,8 +50,8 @@ func Calc() {
 	case "pow":
 		res = float32(math.Pow(float64(a), float64(b)))
 	default:
-		fmt.Println("Выбрана неизвестная операция")
-		os.Exit(1)
+		fmt.Printf("Выбрана неизвестная операция - '%s\n'", op)
+		return err
 	}
 
 	if op != "sqrt" {
@@ -57,4 +59,5 @@ func Calc() {
 	} else {
 		fmt.Printf("Ответ: √%f = %f\n", a, res)
 	}
+	return nil
 }
