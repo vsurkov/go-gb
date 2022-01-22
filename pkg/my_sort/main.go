@@ -1,14 +1,12 @@
-package main
+package mySort
 
 import (
-	"fmt"
 	"os"
 )
 
 func main() {
-	err := router()
+	err := mySort()
 	if err != nil {
-		fmt.Println("%v", err)
 		os.Exit(1)
 	}
 }

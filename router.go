@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-	"os"
 )
 
-func router() {
+func router() error {
 	var choice int
 	msg := `Введите целое число в диапазоне от 1 до 3, включительно:
 	1 - подчет площади прямоугольника
@@ -17,20 +16,34 @@ func router() {
 
 	_, err := fmt.Scanln(&choice)
 	if err != nil {
-		fmt.Println("Ошибка: вероятно, указанное значение не число ")
-		os.Exit(1)
+		fmt.Println("Ошибка: чтения данных")
+		return err
 	}
 
 	switch choice {
 	case 1:
-		SquareArea()
+		err := SquareArea()
+		if err != nil {
+			return err
+		}
 	case 2:
-		CircleData()
+		err := CircleData()
+		if err != nil {
+			return err
+		}
 	case 3:
-		NumComposition()
+		err := NumComposition()
+		if err != nil {
+			return err
+		}
 	case 4:
-		Calc()
+		err := Calc()
+		if err != nil {
+			return err
+		}
 	default:
 		fmt.Println("Ошибка, введенное число не в диапазоне от 1 до 3, или не целое число")
+		return err
 	}
+	return nil
 }
