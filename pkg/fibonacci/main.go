@@ -8,7 +8,7 @@ import (
 
 func main() {
 	// int num, use for calculating functions F(num)
-	num := 10
+	num := 40
 	runFibonacci(num)
 	runFibonacciMapped(num)
 }
@@ -28,5 +28,5 @@ func runFibonacciMapped(num int) {
 		log.Panicf("Fibonacci can be counted only for positive numbers, but received %d", num)
 	}
 	defer timeTrack(time.Now(), "mapped fibonacci")
-	fmt.Printf("FibM(%d) = %d\n", num, FibM(int(num)))
+	fmt.Printf("FibM(%d) = %d\n", num, GetFibonacci(int(num)))
 }
