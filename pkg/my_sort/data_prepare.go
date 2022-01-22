@@ -1,10 +1,18 @@
 package mySort
 
-func prepare(str string) ([]int, error) {
+import (
+	"strings"
+)
+
+func prapareData(raw string) ([]int, error) {
 	// Очищаем входные данные, удаляя случайные двойные запятые, далее разбиваем по запятым на слайс
-	str = clearData(str)
-	slc := toSlice(str)
+	raw = strings.ReplaceAll(raw, ",,", ",")
+	slc := strings.Split(raw, ",")
 
 	// Преобразуем слайс string в слайс int
-	return toIntIN(slc)
+	result, err := intifySlice(slc)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
 }

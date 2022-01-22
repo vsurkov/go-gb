@@ -1,8 +1,10 @@
 package mySort
 
-import "fmt"
+import (
+	"fmt"
+)
 
-func respond(slc []int) {
+func doOutput(slc []int) {
 	//TODO добавить альтернативные методы вывода
-	fmt.Print(stringify(slc))
+	fmt.Print(slc)
 }

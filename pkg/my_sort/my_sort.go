@@ -1,26 +1,23 @@
 package mySort
 
-import (
-	"fmt"
-	"os"
-)
+import "fmt"
 
-func main() {
-
+func mySort() error {
 	// Запрашиваем ввод
-	str, err := request()
+	raw, err := getUserInput()
 	if err != nil {
 		fmt.Println("ОШИБКА: при чтении ввода \n", err)
-		os.Exit(1)
+		return err
 	}
 	// Подготавливаем данные для работы, очищаем строку, выполняем преобразование типов
-	slc, err := prepare(str)
+	slc, err := prapareData(raw)
 	if err != nil {
 		fmt.Println("ОШИБКА: при конвертации значений, одно из значений не целое число \n", err)
-		os.Exit(1)
+		return err
 	}
 
 	// Сортируем указанным методом сортировки и выводим пользователю результат
-	srd := insertsSort(slc)
-	respond(srd)
+	sorted := insertsSort(slc)
+	doOutput(sorted)
+	return nil
 }
