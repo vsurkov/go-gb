@@ -15,14 +15,3 @@ func intifySlice(elements []string) ([]int, error) {
 	}
 	return result, nil
 }
-
-//
-//func stringify(slc []int) string {
-//	var stringified []string
-//	for _, i := range slc {
-//		stringified = append(stringified, strconv.Itoa(i))
-//	}
-//
-//	str := strings.Join(stringified, ",")
-//	return str
-//}
