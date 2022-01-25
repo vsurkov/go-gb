@@ -28,7 +28,7 @@ var (
 	flagJaegerUrl = flag.String(
 		"jaeger_url",
 		defaultJaegerUrl,
-		"Jaeger URL, example: http://jaeger:16686")
+		"Jaeger URL, example: http://jaeger:16686k")
 	flagSentryUrl = flag.String(
 		"sentry_url",
 		defaultSentryUrl,
