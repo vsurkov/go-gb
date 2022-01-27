@@ -126,7 +126,6 @@ func (config *Config) Load() {
 			config.Kafka_broker = *url
 		}
 	}
-
 	if *flagSomeAppID != "" {
 		config.App_id = *flagSomeAppID
 	}
@@ -135,3 +134,21 @@ func (config *Config) Load() {
 		config.App_key = *flagSomeAppKey
 	}
 }
+
+//
+//if *flagKafkaBroker != "" {
+//	url := &URL{}
+//	url, err := url.Create(*flagKafkaBroker)
+//
+//	if err != nil {
+//		fmt.Printf("%v, loaded default value for Kafka_broker \n", err)
+//		config.Kafka_broker.Value = defaultKafkaBroker
+//	} else {
+//		config.Kafka_broker = *url
+//	}
+//}
+//
+//func loadField(flag *int) {
+//	value := flag
+//	fmt.Printf(string(*value))
+//}

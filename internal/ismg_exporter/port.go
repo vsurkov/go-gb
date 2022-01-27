@@ -18,7 +18,7 @@ func (err *PortError) Error() string {
 }
 
 func (toTest *Port) isValid() error {
-	if toTest.Value < 1000 || toTest.Value > 65535 {
+	if toTest.Value <= 1000 || toTest.Value > 65535 {
 		return newPortError(toTest.Value)
 	}
 	return nil
