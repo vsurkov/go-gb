@@ -21,134 +21,96 @@ func NewConfig() *Config {
 	}
 }
 
-// Загрузка значений из флаков или переменных, если значение не валидно то загружаем дефаултное
+const (
+	// Определяем значения по умолчанию, нужны отдельно что бы к ним вернуться при не валидности полученного
+	defaultPort        = 9010
+	defaultDBUrl       = "postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=disable"
+	defaultJaegerUrl   = "http://jaeger:16686"
+	defaultSentryUrl   = "http://sentry:9000"
+	defaultKafkaBroker = "kafka:9000"
+	defaultSomeAppID   = "DEFAULT_APP_ID"
+	defaultSomeAppKey  = "8787928792847928749248742479724"
+)
+
+var (
+	// Определяем флаги
+	flagPort = flag.Int(
+		"port",
+		defaultPort,
+		"Server port")
+	flagDBUrl = flag.String(
+		"db_url",
+		defaultDBUrl,
+		"Database connection string, example: postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=disable")
+	flagJaegerUrl = flag.String(
+		"jaeger_url",
+		defaultJaegerUrl,
+		"Jaeger URL, example: http://jaeger:16686k")
+	flagSentryUrl = flag.String(
+		"sentry_url",
+		defaultSentryUrl,
+		"Sentry URL, example: http://sentry:9000")
+	flagKafkaBroker = flag.String(
+		"kafka_broker",
+		defaultKafkaBroker,
+		"Kafka broker URI, example: kafka:9092")
+	flagSomeAppID = flag.String(
+		"app_id",
+		defaultSomeAppID,
+		"Application ID")
+	flagSomeAppKey = flag.String(
+		"app_key",
+		defaultSomeAppKey,
+		"Application KEY")
+)
+
+// Парсим флаги и загружаем через функции загрузки параметры конфигурации
 func (config *Config) Load() {
-	var (
-		// Определяем значения по умолчанию, нужны отдельно что бы к ним вернуться при не валидности полученного
-		defaultPort        = 9010
-		defaultDBUrl       = "postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=disable"
-		defaultJaegerUrl   = "http://jaeger:16686"
-		defaultSentryUrl   = "http://sentry:9000"
-		defaultKafkaBroker = "kafka:9000"
-		defaultSomeAppID   = "DEFAULT_APP_ID"
-		defaultSomeAppKey  = "8787928792847928749248742479724"
-
-		// Определяем флаги
-		flagPort = flag.Int(
-			"port",
-			defaultPort,
-			"Server port")
-		flagDBUrl = flag.String(
-			"db_url",
-			defaultDBUrl,
-			"Database connection string, example: postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=disable")
-		flagJaegerUrl = flag.String(
-			"jaeger_url",
-			defaultJaegerUrl,
-			"Jaeger URL, example: http://jaeger:16686k")
-		flagSentryUrl = flag.String(
-			"sentry_url",
-			defaultSentryUrl,
-			"Sentry URL, example: http://sentry:9000")
-		flagKafkaBroker = flag.String(
-			"kafka_broker",
-			defaultKafkaBroker,
-			"Kafka broker URI, example: kafka:9092")
-		flagSomeAppID = flag.String(
-			"app_id",
-			defaultSomeAppID,
-			"Application ID")
-		flagSomeAppKey = flag.String(
-			"app_key",
-			defaultSomeAppKey,
-			"Application KEY")
-	)
-
 	flag.Parse()
 
-	if flagPort != nil {
-		port := &Port{}
-		port, err := port.Create(*flagPort)
-		if err != nil {
-			fmt.Printf("%v, loaded default value for Port \n", err)
-			config.Port.Value = defaultPort
-		} else {
-			config.Port = *port
-		}
-
-	}
-
-	if *flagDBUrl != "" {
-		url := &URL{}
-		url, err := url.Create(*flagDBUrl)
-		if err != nil {
-			fmt.Printf("%v, loaded default value for DB_url \n", err)
-			config.DB_url.Value = defaultDBUrl
-		} else {
-			config.DB_url = *url
-		}
-
-	}
-
-	if *flagJaegerUrl != "" {
-		url := &URL{}
-		url, err := url.Create(*flagJaegerUrl)
-
-		if err != nil {
-			fmt.Printf("%v, loaded default value for Jaeger_url \n", err)
-			config.Jaeger_url.Value = defaultJaegerUrl
-		} else {
-			config.Jaeger_url = *url
-		}
-
-	}
-
-	if *flagSentryUrl != "" {
-		url := &URL{}
-		url, err := url.Create(*flagSentryUrl)
-
-		if err != nil {
-			fmt.Printf("%v, loaded default value for Sentry_url \n", err)
-			config.Sentry_url.Value = defaultSentryUrl
-		} else {
-			config.Sentry_url = *url
-		}
-	}
-
-	if *flagKafkaBroker != "" {
-		url := &URL{}
-		url, err := url.Create(*flagKafkaBroker)
-
-		if err != nil {
-			fmt.Printf("%v, loaded default value for Kafka_broker \n", err)
-			config.Kafka_broker.Value = defaultKafkaBroker
-		} else {
-			config.Kafka_broker = *url
-		}
-	}
-	if *flagSomeAppID != "" {
-		config.App_id = *flagSomeAppID
-	}
-
-	if *flagSomeAppKey != "" {
-		config.App_key = *flagSomeAppKey
-	}
+	config.Port = *loadPortParam(flagPort, defaultPort)
+	config.DB_url = *loadURLParam(flagDBUrl, defaultDBUrl)
+	config.Jaeger_url = *loadURLParam(flagJaegerUrl, defaultJaegerUrl)
+	config.Sentry_url = *loadURLParam(flagSentryUrl, defaultSentryUrl)
+	config.Kafka_broker = *loadURLParam(flagKafkaBroker, defaultKafkaBroker)
+	config.App_id = *loadStringParam(flagSomeAppID, defaultSomeAppID)
+	config.App_key = *loadStringParam(flagSomeAppKey, defaultSomeAppID)
 }
 
-//
-//if *flagKafkaBroker != "" {
-//	url := &URL{}
-//	url, err := url.Create(*flagKafkaBroker)
-//
-//	if err != nil {
-//		fmt.Printf("%v, loaded default value for Kafka_broker \n", err)
-//		config.Kafka_broker.Value = defaultKafkaBroker
-//	} else {
-//		config.Kafka_broker = *url
-//	}
-//}
-//
-//func loadField(flag *int) {
-//	value := flag
-//	fmt.Printf(string(*value))
-//}
+// Для функция производит проверку флага и загрузку из него или из ENV, иначе использует дефаултное и возращает Port
+func loadPortParam(flag *int, defaultValue int) *Port {
+	port := &Port{}
+	if flag != nil {
+		p, err := port.Create(*flag)
+		if err != nil {
+			fmt.Printf("%v, loaded default value for Port: %d \n", err, defaultValue)
+			p.Value = defaultValue
+		}
+		return p
+	}
+	port.Value = defaultValue
+	return port
+}
+
+// Для функция производит проверку флага и загрузку из него или из ENV, иначе использует дефаултное и возращает URL
+func loadURLParam(flag *string, defaultValue string) *URL {
+	url := &URL{}
+	if flag != nil {
+		u, err := url.Create(*flag)
+		if err != nil {
+			fmt.Printf("%v, loaded default value for URL: %v \n", err, defaultValue)
+			u.Value = defaultValue
+		}
+		return u
+	}
+	url.Value = defaultValue
+	return url
+}
+
+// Для функция производит проверку флага и загрузку из него или из ENV, иначе использует дефаултное и возращает String
+func loadStringParam(flag *string, defaultValue string) *string {
+	if *flag != "" {
+		return flag
+	}
+	return &defaultValue
+}
