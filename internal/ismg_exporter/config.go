@@ -3,12 +3,13 @@ package ismgExporter
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/goware/urlx"
 	"log"
 	"os"
 	"strconv"
+
+	"github.com/goware/urlx"
+	"github.com/namsral/flag"
 )
-import "github.com/namsral/flag"
 
 // Config Описание базовой структуры конфигурации
 type Config struct {
@@ -21,21 +22,23 @@ type Config struct {
 	AppKey      string `json:"app_key"`
 }
 
-// NewConfig Функция возвращает инициализированную пустую структуру Config
-func NewConfig() *Config {
-	return &Config{
-		Port:        0,
-		DbUrl:       "",
-		JaegerUrl:   "",
-		SentryUrl:   "",
-		KafkaBroker: "",
-		AppId:       "",
-		AppKey:      "",
-	}
-}
+//
+//// NewConfig Функция возвращает инициализированную пустую структуру Config
+//func NewConfig() *Config {
+//	return &Config{
+//		Port:        0,
+//		DbUrl:       "",
+//		JaegerUrl:   "",
+//		SentryUrl:   "",
+//		KafkaBroker: "",
+//		AppId:       "",
+//		AppKey:      "",
+//	}
+//}
 
 // Определяем значения по умолчанию, нужны отдельно что бы к ним вернуться при не валидности полученного
 const (
+	defaultConfigPath  = "configs//ismg_exporter.json"
 	defaultPort        = 9010
 	defaultDBUrl       = "postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=disable"
 	defaultJaegerUrl   = "http://jaeger:16686"
@@ -47,27 +50,44 @@ const (
 
 // Определяем флаги
 var (
+	//flagConfigPath  = flag.String("config", defaultConfigPath, "Configuration path with filename, example: configs/ismg_exporter.json")
 	flagPort        = flag.Int("port", defaultPort, "Server port, must be in the range 1000-65535")
 	flagDBUrl       = flag.String("db_url", defaultDBUrl, "Database connection string, example: postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=disable")
-	flagJaegerUrl   = flag.String("jaeger_url", defaultJaegerUrl, "Jaeger URL, example: http://jaeger:16686k")
-	flagSentryUrl   = flag.String("sentry_url", defaultSentryUrl, "Sentry URL, example: http://sentry:9000")
+	flagJaegerUrl   = flag.String("jaeger_url", defaultJaegerUrl, "Jaeger URL, example: https://jaeger:16686k")
+	flagSentryUrl   = flag.String("sentry_url", defaultSentryUrl, "Sentry URL, example: https://sentry:9000")
 	flagKafkaBroker = flag.String("kafka_broker", defaultKafkaBroker, "Kafka broker URI, example: kafka:9092")
 	flagSomeAppID   = flag.String("app_id", defaultSomeAppID, "Application ID")
 	flagSomeAppKey  = flag.String("app_key", defaultSomeAppKey, "Application KEY")
 )
 
-// LoadFromConfig Загружаем конфигурацию из файла
-func (config *Config) LoadFromConfig(configPath string) error {
-	// Отдельная структура нужна потому что Config содержит в полях струры а не простые типы,
-	// для Decode нужно описание своей структуры для загрузки и последующего приведения к Config
+// Load Парсим флаги и загружаем через функции загрузки параметры конфигурации
+func (config *Config) Load() {
+	flag.Parse()
 
+	err := config.LoadFromFile(defaultConfigPath)
+	if err != nil {
+		log.Printf("Config from file not loaded: %v", err)
+	}
+
+	// Каждый из параметров заполняем результатом загрузки параметра
+	config.Port = *loadPortParam(&config.Port, flagPort, defaultPort)
+	config.DbUrl = *loadURLParam(&config.DbUrl, flagDBUrl, defaultDBUrl)
+	config.JaegerUrl = *loadURLParam(&config.JaegerUrl, flagJaegerUrl, defaultJaegerUrl)
+	config.SentryUrl = *loadURLParam(&config.SentryUrl, flagSentryUrl, defaultSentryUrl)
+	config.KafkaBroker = *loadURLParam(&config.KafkaBroker, flagKafkaBroker, defaultKafkaBroker)
+	config.AppId = *loadStringParam(&config.AppId, flagSomeAppID, defaultSomeAppID)
+	config.AppKey = *loadStringParam(&config.AppKey, flagSomeAppKey, defaultSomeAppID)
+}
+
+// LoadFromFile Загружаем конфигурацию из файла
+func (config *Config) LoadFromFile(configPath string) error {
 	// Открываем файл по configPath и проверяем на ошибки
 	file, err := os.Open(configPath)
 	if err != nil {
 		return fmt.Errorf("load config failed. %v", err)
 	}
 
-	// Закрываем октытый файл в любом случае
+	// Закрываем открытый файл в любом случае
 	defer func() {
 		err := file.Close()
 		if err != nil {
@@ -78,62 +98,67 @@ func (config *Config) LoadFromConfig(configPath string) error {
 	// Декодируем конфигурацию и заполняем структуру конфигурации
 	err = json.NewDecoder(file).Decode(config)
 	if err != nil {
-		fmt.Errorf("can't decode JSON configuration on configPath: %v. Error: \n %v", configPath, err)
+		return fmt.Errorf("can't decode JSON configuration on configPath: %v. Error: \n %v", configPath, err)
 	}
 
 	return nil
 }
 
-// LoadFromParams Парсим флаги и загружаем через функции загрузки параметры конфигурации
-func (config *Config) LoadFromParams() {
-	flag.Parse()
-	// Каждый из параметров заполняем результатом загрузки параметра
-	config.Port = *loadPortParam(flagPort, defaultPort)
-	config.DbUrl = *loadURLParam(flagDBUrl, defaultDBUrl)
-	config.JaegerUrl = *loadURLParam(flagJaegerUrl, defaultJaegerUrl)
-	config.SentryUrl = *loadURLParam(flagSentryUrl, defaultSentryUrl)
-	config.KafkaBroker = *loadURLParam(flagKafkaBroker, defaultKafkaBroker)
-	config.AppId = *loadStringParam(flagSomeAppID, defaultSomeAppID)
-	config.AppKey = *loadStringParam(flagSomeAppKey, defaultSomeAppID)
-}
-
 // Для функция производит проверку флага и загрузку из него или из ENV, иначе использует принятое значение по умолчанию
 // и возращает Int
-func loadPortParam(flag *int, defaultValue int) *int {
+func loadPortParam(configValue *int, flag *int, defaultValue int) *int {
+
 	if flag != nil {
 		if isPortValid(flag) {
 			return flag
 		}
+		if isPortValid(configValue) {
+			return configValue
+		}
 		log.Printf("Port %v invalid (must be int and in the range 1000-65535), loaded default value: %d \n", *flag, defaultValue)
 		return &defaultValue
+	}
+
+	if isPortValid(configValue) {
+		return configValue
 	}
 	return &defaultValue
 }
 
 // Для функция производит проверку флага и загрузку из него или из ENV, иначе использует принятое значение по умолчанию
 // и возращает String
-func loadURLParam(flag *string, defaultValue string) *string {
+func loadURLParam(configValue *string, flag *string, defaultValue string) *string {
 	if flag != nil {
 		if isUrlValid(flag) {
 			return flag
 		}
+		if isUrlValid(configValue) {
+			return configValue
+		}
 		log.Printf("url invalid, loaded default value: %v \n", defaultValue)
 		return &defaultValue
+	}
+
+	if isUrlValid(configValue) {
+		return configValue
 	}
 	return &defaultValue
 }
 
 // Для функция производит проверку флага и загрузку из него или из ENV, иначе использует принятое значение по умолчанию
 // и возращает String
-func loadStringParam(flag *string, defaultValue string) *string {
+func loadStringParam(configValue *string, flag *string, defaultValue string) *string {
 	if *flag != "" {
 		return flag
+	}
+	if *configValue != "" {
+		return configValue
 	}
 	log.Printf("param invalid, loaded default value: %v \n", defaultValue)
 	return &defaultValue
 }
 
-// Валидирует порт, проверяет, что указанное значение порта находится в разрешенном диапазоне от 1000 до 65535
+// Валидация порта, проверка, что указанное значение порта находится в разрешенном диапазоне от 1000 до 65535
 func isPortValid(value *int) bool {
 	if *value <= 1000 || *value > 65535 {
 		return false
@@ -141,6 +166,7 @@ func isPortValid(value *int) bool {
 	return true
 }
 
+// Валидация URL с учетом заданного порта
 func isUrlValid(raw *string) bool {
 	url, err := urlx.Parse(*raw)
 	if err != nil || url.Scheme == "" || url.Host == "" {
@@ -150,7 +176,6 @@ func isUrlValid(raw *string) bool {
 
 	// Проверяем валидность порта в url
 	_, portStr, _ := urlx.SplitHostPort(url)
-
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
 		log.Printf("Port %v invalid (must be int and in the range 1000-65535), error: %v \n", port, err)

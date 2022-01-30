@@ -7,10 +7,6 @@ import (
 
 func main() {
 	config := new(ismgExporter.Config)
-	err := config.LoadFromConfig("configs//ismg_exporter.json")
-	if err != nil {
-		log.Printf("Error on loadign from File %v", err)
-		config.LoadFromParams()
-	}
+	config.Load()
 	log.Printf("Config was loaded successfully \n%v", config)
 }

@@ -17,7 +17,7 @@ func TestNewConfig(t *testing.T) {
 		AppKey:      "app_key_for_testing",
 	}
 	received := ismgExporter.Config{}
-	received.LoadFromParams()
+	received.Load()
 
 	checkIntField(expected.Port, received.Port, t)
 	checkStrField(expected.DbUrl, received.DbUrl, t)
@@ -40,7 +40,7 @@ func TestFileConfig(t *testing.T) {
 		AppKey:      "app_key_for_testing",
 	}
 	received := ismgExporter.Config{}
-	err := received.LoadFromConfig("..//..//configs//ismg_exporter.json")
+	err := received.LoadFromFile("..//..//configs//ismg_exporter.json")
 	if err != nil {
 		log.Printf("Error on loadign from File %v", err)
 	}
