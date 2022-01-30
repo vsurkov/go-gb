@@ -1,0 +1,24 @@
+{
+  "port":
+   {
+     "Value":9011
+   },
+  "db_url":
+  {
+    "Value":"postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=enable"
+  },
+  "jaeger_url":
+  {
+    "Value":"http://jaeger:16687"
+  },
+  "sentry_url":
+  {
+    "Value":"http://sentry:9001"
+  },
+  "kafka_broker":
+  {
+    "Value":"kafka:9001"
+  },
+  "app_id":"DEFAULT_APP_ID_NEW",
+  "app_key":"8787928792847928749248742479724_NEW"
+}
