@@ -22,20 +22,6 @@ type Config struct {
 	AppKey      string `json:"app_key"`
 }
 
-//
-//// NewConfig Функция возвращает инициализированную пустую структуру Config
-//func NewConfig() *Config {
-//	return &Config{
-//		Port:        0,
-//		DbUrl:       "",
-//		JaegerUrl:   "",
-//		SentryUrl:   "",
-//		KafkaBroker: "",
-//		AppId:       "",
-//		AppKey:      "",
-//	}
-//}
-
 // Определяем значения по умолчанию, нужны отдельно что бы к ним вернуться при не валидности полученного
 const (
 	defaultJSONConfig  = "configs//ismg_exporter.json"
