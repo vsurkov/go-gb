@@ -1,7 +1,6 @@
-package ismgExporter_test
+package ismgExporter
 
 import (
-	ismgExporter "github.com/vsurkov/ismg_exporter/internal/ismg_exporter"
 	"testing"
 )
 
@@ -16,10 +15,9 @@ func TestPort_Create(t *testing.T) {
 }
 
 func PortTesting(value int, success bool, t *testing.T) {
-	portStruct := new(ismgExporter.Port)
-	_, err := portStruct.Create(value)
-	if (err != nil) == success {
-		t.Errorf("Verification with port value: %d, was failed: expected result of success is: %v", value, success)
+	valid := isPortValid(&value)
+	if valid != success {
+		t.Errorf("Verification with port value: %d, was failed: expected result of validate is: %v but result is: %v", value, success, valid)
 	}
 
 }
