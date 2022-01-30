@@ -1,9 +1,9 @@
 {
-  "port":9010,
-  "db_url":"postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=disable",
-  "jaeger_url":"http://jaeger:16686",
-  "sentry_url":"http://sentry:9000",
-  "kafka_broker":"kafka:9000",
+  "port":9015,
+  "db_url":"postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=enable",
+  "jaeger_url":"http://jaeger:16687",
+  "sentry_url":"http://sentry:9001",
+  "kafka_broker":"kafka:9001",
   "app_id":"app_id_for_testing",
   "app_key":"app_key_for_testing"
 }

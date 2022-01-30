@@ -38,45 +38,54 @@ type Config struct {
 
 // Определяем значения по умолчанию, нужны отдельно что бы к ним вернуться при не валидности полученного
 const (
-	defaultConfigPath  = "configs//ismg_exporter.json"
+	defaultJSONConfig  = "configs//ismg_exporter.json"
+	defaultYAMLConfig  = "configs//ismg_exporter.yaml"
 	defaultPort        = 9010
 	defaultDBUrl       = "postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=disable"
 	defaultJaegerUrl   = "http://jaeger:16686"
 	defaultSentryUrl   = "http://sentry:9000"
 	defaultKafkaBroker = "kafka:9000"
-	defaultSomeAppID   = "app_id_for_testing"
-	defaultSomeAppKey  = "app_key_for_testing"
+	defaultSomeAppID   = ""
+	defaultSomeAppKey  = ""
 )
 
 // Определяем флаги
 var (
-	//flagConfigPath  = flag.String("config", defaultConfigPath, "Configuration path with filename, example: configs/ismg_exporter.json")
-	flagPort        = flag.Int("port", defaultPort, "Server port, must be in the range 1000-65535")
-	flagDBUrl       = flag.String("db_url", defaultDBUrl, "Database connection string, example: postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=disable")
-	flagJaegerUrl   = flag.String("jaeger_url", defaultJaegerUrl, "Jaeger URL, example: https://jaeger:16686k")
-	flagSentryUrl   = flag.String("sentry_url", defaultSentryUrl, "Sentry URL, example: https://sentry:9000")
-	flagKafkaBroker = flag.String("kafka_broker", defaultKafkaBroker, "Kafka broker URI, example: kafka:9092")
-	flagSomeAppID   = flag.String("app_id", defaultSomeAppID, "Application ID")
-	flagSomeAppKey  = flag.String("app_key", defaultSomeAppKey, "Application KEY")
+	//flagConfigPath  = flag.String("config", defaultJsonConfig, "Configuration path with filename, example: configs/ismg_exporter.json")
+	flagPort        = flag.Int("port", 0, "Server port, must be in the range 1000-65535")
+	flagDBUrl       = flag.String("db_url", "", "Database connection string, example: postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=disable")
+	flagJaegerUrl   = flag.String("jaeger_url", "", "Jaeger URL, example: https://jaeger:16686k")
+	flagSentryUrl   = flag.String("sentry_url", "", "Sentry URL, example: https://sentry:9000")
+	flagKafkaBroker = flag.String("kafka_broker", "", "Kafka broker URI, example: kafka:9092")
+	flagSomeAppID   = flag.String("app_id", "", "Application ID")
+	flagSomeAppKey  = flag.String("app_key", "", "Application KEY")
+	flagDebugMode   = flag.Bool("debug_mode", false, "Debug mode enable logging, default false")
+	debugMode       = false
 )
 
 // Load Парсим флаги и загружаем через функции загрузки параметры конфигурации
-func (config *Config) Load() {
+
+func (config *Config) Load(configPath string) {
 	flag.Parse()
 
-	err := config.LoadFromFile(defaultConfigPath)
+	if configPath == "" {
+		configPath = defaultJSONConfig
+	}
+
+	err := config.LoadFromFile(configPath)
 	if err != nil {
 		log.Printf("Config from file not loaded: %v", err)
 	}
 
 	// Каждый из параметров заполняем результатом загрузки параметра
+	debugMode = *flagDebugMode
 	config.Port = *loadPortParam(&config.Port, flagPort, defaultPort)
 	config.DbUrl = *loadURLParam(&config.DbUrl, flagDBUrl, defaultDBUrl)
 	config.JaegerUrl = *loadURLParam(&config.JaegerUrl, flagJaegerUrl, defaultJaegerUrl)
 	config.SentryUrl = *loadURLParam(&config.SentryUrl, flagSentryUrl, defaultSentryUrl)
 	config.KafkaBroker = *loadURLParam(&config.KafkaBroker, flagKafkaBroker, defaultKafkaBroker)
 	config.AppId = *loadStringParam(&config.AppId, flagSomeAppID, defaultSomeAppID)
-	config.AppKey = *loadStringParam(&config.AppKey, flagSomeAppKey, defaultSomeAppID)
+	config.AppKey = *loadStringParam(&config.AppKey, flagSomeAppKey, defaultSomeAppKey)
 }
 
 // LoadFromFile Загружаем конфигурацию из файла
@@ -84,7 +93,7 @@ func (config *Config) LoadFromFile(configPath string) error {
 	// Открываем файл по configPath и проверяем на ошибки
 	file, err := os.Open(configPath)
 	if err != nil {
-		return fmt.Errorf("load config failed. %v", err)
+		return fmt.Errorf("%v", err)
 	}
 
 	// Закрываем открытый файл в любом случае
@@ -170,7 +179,9 @@ func isPortValid(value *int) bool {
 func isUrlValid(raw *string) bool {
 	url, err := urlx.Parse(*raw)
 	if err != nil || url.Scheme == "" || url.Host == "" {
-		log.Printf("URL %v: %v", *raw, err)
+		if debugMode {
+			log.Printf("URL %v: %v", *raw, err)
+		}
 		return false
 	}
 
@@ -178,12 +189,16 @@ func isUrlValid(raw *string) bool {
 	_, portStr, _ := urlx.SplitHostPort(url)
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
-		log.Printf("Port %v invalid (must be int and in the range 1000-65535), error: %v \n", port, err)
+		if debugMode {
+			log.Printf("Port %v invalid (must be int and in the range 1000-65535), error: %v \n", port, err)
+		}
 		return false
 	}
 
 	if err != nil || !isPortValid(&port) {
-		log.Printf("Port %v invalid (must be int and in the range 1000-65535) \n", port)
+		if debugMode {
+			log.Printf("Port %v invalid (must be int and in the range 1000-65535) \n", port)
+		}
 		return false
 	}
 	return true

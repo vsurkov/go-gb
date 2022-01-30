@@ -7,6 +7,6 @@ import (
 
 func main() {
 	config := new(ismgExporter.Config)
-	config.Load()
+	config.Load("")
 	log.Printf("Config was loaded successfully \n%v", config)
 }
