@@ -2,52 +2,55 @@ package ismgExporter_test
 
 import (
 	ismgExporter "github.com/vsurkov/ismg_exporter/internal/ismg_exporter"
+	"log"
 	"testing"
 )
 
 func TestNewConfig(t *testing.T) {
-
 	expected := ismgExporter.Config{
-		Port:        ismgExporter.Port{9010},
-		DbURL:       ismgExporter.URL{"postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=disable"},
-		JaegerURL:   ismgExporter.URL{"http://jaeger:16686"},
-		SentryURL:   ismgExporter.URL{"http://sentry:9000"},
-		KafkaBroker: ismgExporter.URL{"kafka:9000"},
-		AppID:       "DEFAULT_APP_ID",
-		AppKey:      "8787928792847928749248742479724",
+		Port:        9010,
+		DbUrl:       "postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=disable",
+		JaegerUrl:   "http://jaeger:16686",
+		SentryUrl:   "http://sentry:9000",
+		KafkaBroker: "kafka:9000",
+		AppId:       "app_id_for_testing",
+		AppKey:      "app_key_for_testing",
 	}
-	received := new(ismgExporter.Config)
+	received := ismgExporter.Config{}
 	received.LoadFromParams()
 
-	checkIntField(expected.Port.Value, received.Port.Value, t)
-	checkStrField(expected.DbURL.Value, received.DbURL.Value, t)
-	checkStrField(expected.JaegerURL.Value, received.JaegerURL.Value, t)
-	checkStrField(expected.SentryURL.Value, received.SentryURL.Value, t)
-	checkStrField(expected.KafkaBroker.Value, received.KafkaBroker.Value, t)
-	checkStrField(expected.AppID, received.AppID, t)
+	checkIntField(expected.Port, received.Port, t)
+	checkStrField(expected.DbUrl, received.DbUrl, t)
+	checkStrField(expected.JaegerUrl, received.JaegerUrl, t)
+	checkStrField(expected.SentryUrl, received.SentryUrl, t)
+	checkStrField(expected.KafkaBroker, received.KafkaBroker, t)
+	checkStrField(expected.AppId, received.AppId, t)
 	checkStrField(expected.AppKey, received.AppKey, t)
 }
 
 func TestFileConfig(t *testing.T) {
 
 	expected := ismgExporter.Config{
-		Port:        ismgExporter.Port{9011},
-		DbURL:       ismgExporter.URL{"postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=enable"},
-		JaegerURL:   ismgExporter.URL{"http://jaeger:16686"},
-		SentryURL:   ismgExporter.URL{"http://sentry:9000"},
-		KafkaBroker: ismgExporter.URL{"kafka:9000"},
-		AppID:       "DEFAULT_APP_ID",
-		AppKey:      "8787928792847928749248742479724",
+		Port:        9010,
+		DbUrl:       "postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=disable",
+		JaegerUrl:   "http://jaeger:16686",
+		SentryUrl:   "http://sentry:9000",
+		KafkaBroker: "kafka:9000",
+		AppId:       "app_id_for_testing",
+		AppKey:      "app_key_for_testing",
 	}
-	received := new(ismgExporter.Config)
-	received.LoadFromConfig("..//..//configs//ismg_exporter.json")
+	received := ismgExporter.Config{}
+	err := received.LoadFromConfig("..//..//configs//ismg_exporter.json")
+	if err != nil {
+		log.Printf("Error on loadign from File %v", err)
+	}
 
-	checkIntField(expected.Port.Value, received.Port.Value, t)
-	checkStrField(expected.DbURL.Value, received.DbURL.Value, t)
-	checkStrField(expected.JaegerURL.Value, received.JaegerURL.Value, t)
-	checkStrField(expected.SentryURL.Value, received.SentryURL.Value, t)
-	checkStrField(expected.KafkaBroker.Value, received.KafkaBroker.Value, t)
-	checkStrField(expected.AppID, received.AppID, t)
+	checkIntField(expected.Port, received.Port, t)
+	checkStrField(expected.DbUrl, received.DbUrl, t)
+	checkStrField(expected.JaegerUrl, received.JaegerUrl, t)
+	checkStrField(expected.SentryUrl, received.SentryUrl, t)
+	checkStrField(expected.KafkaBroker, received.KafkaBroker, t)
+	checkStrField(expected.AppId, received.AppId, t)
 	checkStrField(expected.AppKey, received.AppKey, t)
 
 }
