@@ -2,7 +2,7 @@ package ismgExporter_test
 
 import (
 	"fmt"
-	ismgExporter "github.com/vsurkov/ismg_exporter/internal/ismg_exporter"
+	ismgExporter "github.com/vsurkov/ismg_exporter/internal/config"
 	"testing"
 )
 

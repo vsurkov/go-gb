@@ -1,7 +1,7 @@
 package main
 
 import (
-	ismgExporter "github.com/vsurkov/ismg_exporter/internal/ismg_exporter"
+	ismgExporter "github.com/vsurkov/ismg_exporter/internal/config"
 	"log"
 )
 
