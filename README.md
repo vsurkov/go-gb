@@ -1,6 +1,22 @@
 # go-gb
 Golang practice
 
+##HW-10 
+Добавлены тесты производительности для /pkg/fibonacci.go
+__go test -bench=. -benchtime 100x -benchmem__
+При сравнении обычного теста и теста с b.ResetTimer(), получены следующие результаты.
+benchmark             old ns/op     new ns/op     delta
+BenchmarkFib-8        109060        1122          -98.97%
+BenchmarkMapped-8     2828          13.3          -99.53%
+
+benchmark             old allocs     new allocs     delta
+BenchmarkFib-8        5              0              -100.00%
+BenchmarkMapped-8     5              0              -100.00%
+
+benchmark             old bytes     new bytes     delta
+BenchmarkFib-8        1150          0             -100.00%
+BenchmarkMapped-8     1146          0             -100.00%
+
 ##HW-9
 Добавлена загрузка конфигурации из JSON-файла.
 Добавлена валидация для порта указываемого в URL.
