@@ -2,7 +2,7 @@
 Golang practice
 
 ##HW-10 
-Добавлены тесты производительности для /pkg/fibonacci.go
+1. Добавлены тесты производительности для **/pkg/fibonacci.go**
 __go test -bench=. -benchtime 100x -benchmem__
 При сравнении обычного теста и теста с b.ResetTimer(), получены следующие результаты.
 benchmark             old ns/op     new ns/op     delta
@@ -16,6 +16,10 @@ BenchmarkMapped-8     5              0              -100.00%
 benchmark             old bytes     new bytes     delta
 BenchmarkFib-8        1150          0             -100.00%
 BenchmarkMapped-8     1146          0             -100.00%
+
+2. В **/internal/config/config_url_test.go** и **/internal/config/config_port_test.go** реализован пример табличного теста с параллельным запуском.
+3. В **/internal/config/config_test.go** реализованы общие тесты и использован reflect.DeepEqual().
+4. В **/pkg/my_sort/insert_sort_test.go** добавлен Example тест.
 
 ##HW-9
 Добавлена загрузка конфигурации из JSON-файла.

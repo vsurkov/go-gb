@@ -3,6 +3,7 @@ package ismgExporter_test
 import (
 	"fmt"
 	ismgExporter "github.com/vsurkov/ismg_exporter/internal/config"
+	"reflect"
 	"testing"
 )
 
@@ -19,6 +20,12 @@ func TestNewConfig(t *testing.T) {
 	received := ismgExporter.Config{}
 	received.Load("..//..//configs//ismg_exporter.json")
 
+	// Общее сравнение двух объектов
+	if !reflect.DeepEqual(expected, received) {
+		t.Errorf("DeepEqual fail")
+	}
+
+	// Сравнение по полям, позволяет увидеть где именно ошибка
 	checkIntField(expected.Port, received.Port, t)
 	checkStrField(expected.DbUrl, received.DbUrl, t)
 	checkStrField(expected.JaegerUrl, received.JaegerUrl, t)
