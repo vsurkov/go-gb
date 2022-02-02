@@ -18,7 +18,7 @@ BenchmarkFib-8        1150          0             -100.00%
 BenchmarkMapped-8     1146          0             -100.00%
 
 2. В **/internal/config/config_url_test.go** и **/internal/config/config_port_test.go** реализован пример табличного теста с параллельным запуском.
-3. В **/internal/config/config_test.go** реализованы общие тесты и использован reflect.DeepEqual().
+3. В **/internal/config/config_test.go** реализованы общие тесты с использованием testify и использован reflect.DeepEqual().
 4. В **/pkg/my_sort/insert_sort_test.go** добавлен Example тест.
 
 ##HW-9
