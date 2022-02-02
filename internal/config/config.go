@@ -1,10 +1,10 @@
 package ismgExporter
 
 import (
-	"encoding/json"
 	"fmt"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"log"
-	"os"
 	"strconv"
 
 	"github.com/goware/urlx"
@@ -13,19 +13,18 @@ import (
 
 // Config Описание базовой структуры конфигурации
 type Config struct {
-	Port        int    `json:"port"`
-	DbUrl       string `json:"db_url"`
-	JaegerUrl   string `json:"jaeger_url"`
-	SentryUrl   string `json:"sentry_url"`
-	KafkaBroker string `json:"kafka_broker"`
-	AppId       string `json:"app_id"`
-	AppKey      string `json:"app_key"`
+	Port        int    `yaml:"port"`
+	DbUrl       string `yaml:"db_url"`
+	JaegerUrl   string `yaml:"jaeger_url"`
+	SentryUrl   string `yaml:"sentry_url"`
+	KafkaBroker string `yaml:"kafka_broker"`
+	AppId       string `yaml:"app_id"`
+	AppKey      string `yaml:"app_key"`
 }
 
 // Определяем значения по умолчанию, нужны отдельно что бы к ним вернуться при не валидности полученного
 const (
-	defaultJSONConfig  = "configs//ismg_exporter.json"
-	defaultYAMLConfig  = "configs//ismg_exporter.yaml"
+	defaultConfig      = "configs/ismg_exporter.yaml"
 	defaultPort        = 9010
 	defaultDBUrl       = "postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=disable"
 	defaultJaegerUrl   = "http://jaeger:16686"
@@ -37,7 +36,7 @@ const (
 
 // Определяем флаги
 var (
-	//flagConfigPath  = flag.String("config", defaultJsonConfig, "Configuration path with filename, example: configs/ismg_exporter.json")
+	//flagConfigPath  = flag.String("config", defaultConfig, "Configuration path with filename, example: configs/ismg_exporter.yaml")
 	flagPort        = flag.Int("port", 0, "Server port, must be in the range 1000-65535")
 	flagDBUrl       = flag.String("db_url", "", "Database connection string, example: postgres://db-user:db-password@petstore-db:5432/petstore?sslmode=disable")
 	flagJaegerUrl   = flag.String("jaeger_url", "", "Jaeger URL, example: https://jaeger:16686k")
@@ -55,7 +54,7 @@ func (config *Config) Load(configPath string) {
 	flag.Parse()
 
 	if configPath == "" {
-		configPath = defaultJSONConfig
+		configPath = defaultConfig
 	}
 
 	err := config.LoadFromFile(configPath)
@@ -77,25 +76,15 @@ func (config *Config) Load(configPath string) {
 // LoadFromFile Загружаем конфигурацию из файла
 func (config *Config) LoadFromFile(configPath string) error {
 	// Открываем файл по configPath и проверяем на ошибки
-	file, err := os.Open(configPath)
+	file, err := ioutil.ReadFile(configPath)
 	if err != nil {
 		return fmt.Errorf("%v", err)
 	}
 
-	// Закрываем открытый файл в любом случае
-	defer func() {
-		err := file.Close()
-		if err != nil {
-			log.Fatalf("can't close file. %v", err)
-		}
-	}()
-
-	// Декодируем конфигурацию и заполняем структуру конфигурации
-	err = json.NewDecoder(file).Decode(config)
+	err = yaml.Unmarshal(file, config)
 	if err != nil {
-		return fmt.Errorf("can't decode JSON configuration on configPath: %v. Error: \n %v", configPath, err)
+		return fmt.Errorf("can't decode YAML configuration on: %v. Error: \n %v", configPath, err)
 	}
-
 	return nil
 }
 
